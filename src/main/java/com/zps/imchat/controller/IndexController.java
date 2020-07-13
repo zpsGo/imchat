@@ -11,6 +11,6 @@ public class IndexController {
 
     @GetMapping("/index")
     public String index(){
-        return "hello world";
+        return "hello world,增加了一点东西";
     }
 }
