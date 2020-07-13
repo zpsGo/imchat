@@ -1,0 +1,29 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zps.imchat.mapper.MyFriendsDao">
+
+
+    <resultMap id="findMyFriends" type="com.zps.imchat.bean.MyFz">
+        <id property="fzId" column="my_fz_id"/>
+        <result property="fzGroupname" column="fz_groupname"/>
+        <collection property="users" ofType="com.zps.imchat.bean.User">
+            <id property="id" column="id"/>
+            <result property="username" column="username"/>
+            <result property="pass" column="pass"/>
+            <result property="sign" column="sign"/>
+            <result property="status" column="status"/>
+            <result property="avatar" column="avatar"/>
+            <result property="sex" column="sex"/>
+        </collection>
+
+
+    </resultMap>
+    <select id="findMyFz" resultMap="findMyFriends" parameterType="long">
+           select friend.* ,fz.* ,user.* from
+           im_my_friend friend,im_my_fz fz,im_user user
+           where friend.my_fz_id = fz.fz_id and friend.user_id=user.id
+           and friend.my_fz_id=#{fz_id}
+    </select>
+
+</mapper>

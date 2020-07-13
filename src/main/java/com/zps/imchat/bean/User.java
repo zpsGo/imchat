@@ -1,25 +1,24 @@
 package com.zps.imchat.bean;
 
-import java.io.Serializable;
 /**
- * @author: zps
- * @desc : 用户实体类
- **/
-public class User implements Serializable {
+ * @author :zps
+ * @desc:用户实体类
+ */
+public class User {
 
-    private Long id;   //用户id
+    private Long id;
 
-    private String username;   //用户昵称
+    private String username;
 
-    private  transient String pass;  //用户密码
+    private  transient String pass;
 
-    private String sign;     //用户签名
+    private String sign;
 
-    private String status;   //用户状态
+    private String status;
 
-    private String avatar;   //用户图片
+    private String avatar;
 
-    private Integer sex;    //用户性别
+    private Integer sex;
 
     public Long getId() {
         return id;

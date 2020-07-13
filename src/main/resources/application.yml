@@ -10,4 +10,3 @@ spring:
     password: 88888888
     driver-class-name: com.mysql.jdbc.Driver
 
-

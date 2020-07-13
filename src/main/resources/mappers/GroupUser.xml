@@ -1,0 +1,23 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zps.imchat.mapper.GroupUsersDao">
+
+  <select id="findGropUsers" parameterType="Long" resultType="com.zps.imchat.bean.User">
+      select user.* from im_user user , im_group_user guser
+      where guser.group_id=#{groupid} and guser.user_id = user.id
+  </select>
+
+    <select id="findGroupUsersId" parameterType="Long" resultType="java.lang.Long">
+        select user_id from im_group_user where group_id=#{groupId}
+    </select>
+
+    <select id="getUserByGroupId" parameterType="Long" resultType="com.zps.imchat.bean.User">
+        select user.* from im_group g,im_user user
+        where g.group_id=#{groupId} and g.user_id=user.id
+    </select>
+
+    <select id="findUserIdByGroupId" resultType="Long" parameterType="Long">
+        select user_id from im_group where group_id=#{groupId}
+    </select>
+</mapper>

@@ -1,10 +1,18 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zps.imchat.mapper.UserMapper">
+<mapper namespace="com.zps.imchat.mapper.UserDao">
 
-    <select id="login" resultType="com.zps.imchat.bean.User">
-        select * from im_user where id=#{id} and pass=#{pass}
+    <select id="findUser" parameterType="Long" resultType="com.zps.imchat.bean.User">
+        select * from im_user where id=#{id}
     </select>
+
+    <select id="login" parameterType="com.zps.imchat.bean.User" resultType="com.zps.imchat.bean.User">
+        select * from im_user where id=#{user.id} and pass=#{user.pass}
+    </select>
+
+    <update id="updateUserStatus">
+        update im_user set status=#{status} where id=#{userId}
+    </update>
 
 </mapper>
