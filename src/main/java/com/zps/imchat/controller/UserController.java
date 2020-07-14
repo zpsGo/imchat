@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.zps.imchat.bean.User;
 import com.zps.imchat.service.UserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.sql.SQLSyntaxErrorException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author: zps
@@ -28,12 +31,17 @@ public class UserController {
 
     //登录
     @PostMapping("/login")
-    public String login(@RequestBody JSONObject jsonParam, HttpServletRequest request, Model model){
-        System.out.println(jsonParam.get("id"));
-        System.out.println(jsonParam.get("pass"));
+    public String login(@PathParam("id") String id , @PathParam("pass") String pass , HttpServletRequest request){
+        //判断输入是否合法
+        if(StringUtils.isEmpty(id) || StringUtils.isEmpty(pass))
+            return "-1";
+        Pattern pattern = Pattern.compile("^[0-9]*$");
+        Matcher matcher = pattern.matcher(id);
+        if(!matcher.matches()) return "-1";
+        //验证数据库
         User user = new User();
-        user.setId(Long.parseLong(jsonParam.getString("id")));
-        user.setPass((String) jsonParam.get("pass"));
+        user.setId(Long.parseLong(id));
+        user.setPass(pass);
         User loginUser = userService.login(user);
         if(loginUser != null){
             //用户已经登录了
