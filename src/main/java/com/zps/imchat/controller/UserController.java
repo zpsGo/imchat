@@ -45,8 +45,8 @@ public class UserController {
         User loginUser = userService.login(user);
         if(loginUser != null){
             //用户已经登录了
-            if(loginUser.getStatus().equals("online"))
-                return "0";
+//            if(loginUser.getStatus().equals("online"))
+//                return "0";
             //登录成功
             request.getSession().setAttribute("userId",loginUser.getId());
             userService.updateUserStatus(loginUser.getId(),"online");
