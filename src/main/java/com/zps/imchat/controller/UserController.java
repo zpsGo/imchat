@@ -3,6 +3,8 @@ package com.zps.imchat.controller;
 import com.google.gson.Gson;
 import com.zps.imchat.bean.User;
 import com.zps.imchat.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.regex.Pattern;
  * @author: zps
  **/
 @RestController
+@Api(tags = "用户相关接口")
 @RequestMapping("/user")
 public class UserController {
 
@@ -27,6 +30,7 @@ public class UserController {
 
     //登录
     @PostMapping("/login")
+    @ApiOperation(value="用户登录接口")
     public String login(@PathParam("id") String id , @PathParam("pass") String pass , HttpServletRequest request){
         //判断输入是否合法
         if(StringUtils.isEmpty(id) || StringUtils.isEmpty(pass))
@@ -57,6 +61,7 @@ public class UserController {
 
     //获取好友信息
     @GetMapping("/mine")
+    @ApiOperation(value="获取好友信息接口")
     public String getMineInfo(HttpServletRequest request){    //获取登录初始化的信息
 //        return gson.toJson(userService.getMineInfo((long) 2));
         if(StringUtils.isEmpty(request.getSession().getAttribute("userId")))
@@ -66,6 +71,7 @@ public class UserController {
 
     //获取群成员信息
     @GetMapping("/mermber")
+    @ApiOperation(value="获取群成员信息接口")
     public String getMermber(@PathParam("groupid") String groupid){
 
         return gson.toJson(userService.getMermbers(Long.parseLong(groupid)));
