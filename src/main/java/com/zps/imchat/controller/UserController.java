@@ -62,11 +62,8 @@ public class UserController {
     //获取好友信息
     @GetMapping("/mine")
     @ApiOperation(value="获取好友信息接口")
-    public String getMineInfo(HttpServletRequest request){    //获取登录初始化的信息
-//        return gson.toJson(userService.getMineInfo((long) 2));
-        if(StringUtils.isEmpty(request.getSession().getAttribute("userId")))
-            return "Session过期，请重新登录！";
-        return gson.toJson(userService.getMineInfo((Long)request.getSession().getAttribute("userId")));
+    public String getMineInfo(@PathParam("userid") String userid){    //获取登录初始化的信息
+        return gson.toJson(userService.getMineInfo(Long.parseLong(userid)));
     }
 
     //获取群成员信息
