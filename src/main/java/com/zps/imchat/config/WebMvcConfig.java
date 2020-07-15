@@ -16,7 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //设置允许跨域的路径
         registry.addMapping("/**")
                 //放行哪些原始域
-                .allowedOrigins("http://localhost:8081")
+                .allowedOrigins("*")
                 //是否发送cookie信息
                 .allowCredentials(true)
                 //放行哪些请求方法
