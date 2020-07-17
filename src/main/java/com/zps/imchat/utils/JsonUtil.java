@@ -47,9 +47,10 @@ public class JsonUtil {
         msgJson.setDataMap(map);
         String str = pojoTojson(msgJson);
         System.out.println(str);
+        str = "{\"type\":\"connect\",\"dataMap\":{\"userid\":\"1\"}}";
 
         MsgJson msgJson1 = jsonTopojo(str , MsgJson.class);
-        System.out.println(msgJson.getDataMap().get("from"));
+        System.out.println(msgJson1.getDataMap().get("from"));
 
 
 //        UserFz userFz = new UserFz();

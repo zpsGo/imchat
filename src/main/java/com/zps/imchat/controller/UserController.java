@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import com.zps.imchat.bean.User;
 import com.zps.imchat.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +31,7 @@ public class UserController {
     //登录
     @PostMapping("/login")
     @ApiOperation(value="用户登录接口")
-    public String login(@PathParam("id") String id , @PathParam("pass") String pass , HttpServletRequest request){
+    public String login(@RequestParam("id") String id , @RequestParam("pass") String pass , HttpServletRequest request){
         //判断输入是否合法
         if(StringUtils.isEmpty(id) || StringUtils.isEmpty(pass))
             return "-1";
@@ -62,16 +62,20 @@ public class UserController {
     //获取好友信息
     @GetMapping("/mine")
     @ApiOperation(value="获取好友信息接口")
-    public String getMineInfo(@PathParam("userid") String userid){    //获取登录初始化的信息
+    @ApiImplicitParam(name = "userid", value = "用户id", required = true, dataType = "String", paramType = "query")
+    public String getMineInfo(@RequestParam("userid") String userid){    //获取登录初始化的信息
         return gson.toJson(userService.getMineInfo(Long.parseLong(userid)));
     }
 
     //获取群成员信息
     @GetMapping("/mermber")
     @ApiOperation(value="获取群成员信息接口")
-    public String getMermber(@PathParam("groupid") String groupid){
+    @ApiImplicitParam(name = "groupid", value = "群聊号", required = true, dataType = "String", paramType = "query")
+    public String getMermber(@RequestParam("groupid") String groupid){
 
         return gson.toJson(userService.getMermbers(Long.parseLong(groupid)));
 
     }
+
+
 }

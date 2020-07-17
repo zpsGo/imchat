@@ -125,6 +125,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
         userMap.add(channel);
         System.out.println("有新连接\" + \"当前连接 ：\" + userMap.size()");
         log.info("有新连接" + "当前连接 ：" + userMap.size() );
+
     }
 
     //移除用户连接

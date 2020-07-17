@@ -12,6 +12,16 @@ public class MyFriends {
 
     private String nickname;
 
+    private Long statu;
+
+    public Long getStatu() {
+        return statu;
+    }
+
+    public void setStatu(Long statu) {
+        this.statu = statu;
+    }
+
     public Long getMyFriendId() {
         return myFriendId;
     }
@@ -46,11 +56,12 @@ public class MyFriends {
 
     @Override
     public String toString() {
-        return "MyFriendsDao{" +
+        return "MyFriends{" +
                 "myFriendId=" + myFriendId +
                 ", myFzId=" + myFzId +
                 ", userId=" + userId +
                 ", nickname='" + nickname + '\'' +
+                ", statu=" + statu +
                 '}';
     }
 }

@@ -11,9 +11,6 @@ import com.zps.imchat.bean.MyFz;
 import com.zps.imchat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +71,8 @@ public class UserServiceImp implements UserService {
         GroupJson groupJson = new GroupJson();
         //获取群主信息
         User user = groupUsersDao.getUserByGroupId(gruopid);
+        if(user == null)
+            return null;
         user.setUsername("【群主】"+user.getUsername());
         //添加成员信息，包括群主
         groupJson.getList().add(user);

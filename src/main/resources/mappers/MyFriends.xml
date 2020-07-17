@@ -26,4 +26,13 @@
            and friend.my_fz_id=#{fz_id}
     </select>
 
+    <insert id="addFriend" parameterType="com.zps.imchat.bean.MyFriends" useGeneratedKeys="true"
+            keyProperty="myFriendId" keyColumn="my_friend_id">
+        insert into im_my_friend (my_fz_id , user_id , nickName) values (#{myFzId} , #{userId} , #{nickname})
+    </insert>
+
+    <delete id="deleteFriend">
+        delete from im_my_friend where my_fz_id=#{myFzid} and user_id=#{userId}
+    </delete>
+
 </mapper>

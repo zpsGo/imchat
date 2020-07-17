@@ -1,6 +1,7 @@
 package com.zps.imchat.service.Imp;
 
 import com.zps.imchat.mapper.ChatLogsDao;
+import com.zps.imchat.service.ChatLogsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @desc: 聊天历史持服务层
  */
 @Service
-public class ChatLogsImp implements ChatLogsDao {
+public class ChatLogsImp implements ChatLogsService {
 
     @Autowired
     ChatLogsDao chatLogs;

@@ -2,6 +2,7 @@ package com.zps.imchat.service.Imp;
 
 import com.zps.imchat.mapper.MyFriendsDao;
 import com.zps.imchat.bean.MyFz;
+import com.zps.imchat.service.MyFriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
  * @desc: 好友信息服务层
  */
 @Service
-public class MyFridendsImp implements MyFriendsDao {
+public class MyFridendsImp implements MyFriendService {
 
     @Autowired
     MyFriendsDao myFriendsDao;
