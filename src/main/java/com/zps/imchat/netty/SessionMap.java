@@ -1,9 +1,10 @@
 package com.zps.imchat.netty;
 
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * @author: zps
@@ -11,7 +12,7 @@ import java.util.logging.Logger;
  **/
 public class SessionMap {
 
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(SessionMap.class);
+    private static final Logger log = LoggerFactory.getLogger(SessionMap.class);
 
     public static ConcurrentHashMap<String , Channel> sessions = new ConcurrentHashMap<>();
 

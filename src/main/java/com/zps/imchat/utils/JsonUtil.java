@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.zps.imchat.bean.UserFz;
 import com.zps.imchat.jsonbean.MsgJson;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class JsonUtil {
         MsgJson msgJson = new MsgJson();
         msgJson.setType("chat");
         msgJson.setExtand("额外的消息");
+        msgJson.setSendtime(new Date());
         Map<String ,String> map = new HashMap<>();
         map.put("from" , "1");
         map.put("to" , "2");
@@ -47,7 +49,7 @@ public class JsonUtil {
         msgJson.setDataMap(map);
         String str = pojoTojson(msgJson);
         System.out.println(str);
-        str = "{\"type\":\"connect\",\"dataMap\":{\"userid\":\"1\"}}";
+//        str = "{\"type\":\"connect\",\"dataMap\":{\"userid\":\"1\"}}";
 
         MsgJson msgJson1 = jsonTopojo(str , MsgJson.class);
         System.out.println(msgJson1.getDataMap().get("from"));

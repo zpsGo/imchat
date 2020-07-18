@@ -48,11 +48,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
          switch (type) {
 
              case "connect" :   /**第一次连接，将userId和channnel进行绑定 */
-                 String userId = msgData.getDataMap().get("userId");
+                 String userId = msgData.getDataMap().get("userid");
+                 System.out.println(userId);
                  SessionMap.put(userId , channel);
-
                  //离线未读聊天信息获取，待为完成
-
                  break;
 
              case "singleChat" :  /**单聊 */
