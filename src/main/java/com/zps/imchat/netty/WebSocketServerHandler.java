@@ -17,10 +17,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +47,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
          System.out.println(msg);
 
          //channel.writeAndFlush(new TextWebSocketFrame("干嘛呢"));
-
          MsgJson msgData = JsonUtil.jsonTopojo(msg ,MsgJson.class);
          String type = msgData.getType();
 
