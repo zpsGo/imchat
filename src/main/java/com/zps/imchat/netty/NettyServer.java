@@ -77,7 +77,7 @@ public class NettyServer {
                         }
                     });
             ChannelFuture f = boot.bind(this.port).sync();
-            System.out.println("服务已经启动！");
+            System.out.println("聊天服务已经启动！");
             f.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
