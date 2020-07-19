@@ -2,6 +2,7 @@ package com.zps.imchat.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @author :zps
  * @desc:分组朋友信息实体
  */
-public class MyFz {
+public class MyFz implements Serializable {
 
     @SerializedName("id")
     private Long fzId;

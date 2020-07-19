@@ -101,6 +101,11 @@ public class UserServiceImp implements UserService {
         userDao.updateUserStatus(userId,status);
     }
 
+    @Override
+    public List<Long> getUserId() {
+        return userDao.getUserId();
+    }
+
 }
 
 

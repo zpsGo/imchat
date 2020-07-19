@@ -1,7 +1,9 @@
 package com.zps.imchat.service.Imp;
 
+import com.zps.imchat.bean.ChatLogs;
 import com.zps.imchat.mapper.ChatLogsDao;
 import com.zps.imchat.service.ChatLogsService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,15 @@ import java.util.List;
 public class ChatLogsImp implements ChatLogsService {
 
     @Autowired
-    ChatLogsDao chatLogs;
+    ChatLogsDao chatLogsDao;
 
     @Override
     public List<com.zps.imchat.bean.ChatLogs> chatLogs(Long userId, int status) {
-        return chatLogs.chatLogs(userId,status);
+        return chatLogsDao.chatLogs(userId,status);
+    }
+
+    @Override
+    public void saveLogs(ChatLogs chatLogs) {
+        chatLogsDao.saveLogs(chatLogs);
     }
 }

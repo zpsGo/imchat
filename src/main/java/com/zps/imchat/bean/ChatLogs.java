@@ -81,5 +81,7 @@ public class ChatLogs {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+
 }
 

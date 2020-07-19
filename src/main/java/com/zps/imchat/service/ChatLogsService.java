@@ -14,4 +14,5 @@ public interface ChatLogsService {
 
     public List<ChatLogs> chatLogs(Long userId, int status);
 
+    void saveLogs(ChatLogs chatLogs);
 }

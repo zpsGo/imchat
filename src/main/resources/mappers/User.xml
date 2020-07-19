@@ -15,4 +15,8 @@
         update im_user set status=#{status} where id=#{userId}
     </update>
 
+    <select id="getUserId" resultType="Long">
+        select id from im_user
+    </select>
+
 </mapper>

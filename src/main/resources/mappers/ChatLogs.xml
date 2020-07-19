@@ -7,4 +7,10 @@
        select * from im_chatlog where toId=#{userId} and status=#{status}
    </select>
 
+   <insert id="saveLogs" parameterType="com.zps.imchat.bean.ChatLogs">
+       INSERT INTO im_chatlog (fromId , toId , content,sendTime , typ ,STATUS)
+       VALUES (#{chatLogs.fromid} , #{chatLogs.toid},#{chatLogs.content},
+               #{chatLogs.sendtime},#{chatLogs.type},#{chatLogs.status})
+   </insert>
+
 </mapper>

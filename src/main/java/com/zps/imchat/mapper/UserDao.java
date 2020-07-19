@@ -4,6 +4,8 @@ import com.zps.imchat.bean.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author :zps
  * @desc: 个人信息持久层接口
@@ -18,6 +20,9 @@ public interface UserDao {
     public User findUser(long id);
 
     void updateUserStatus(@Param("userId") Long userId, @Param("status") String status);
+
+    //获取所用用户的id
+    List<Long> getUserId();
 
 
 }

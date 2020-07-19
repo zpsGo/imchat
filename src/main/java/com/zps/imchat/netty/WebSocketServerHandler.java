@@ -2,9 +2,11 @@ package com.zps.imchat.netty;
 
 import com.zps.imchat.bean.ChatLogs;
 import com.zps.imchat.jsonbean.MsgJson;
+import com.zps.imchat.rabbitmq.MqServer;
 import com.zps.imchat.service.ChatLogsService;
 import com.zps.imchat.service.GroupUserService;
 import com.zps.imchat.utils.JsonUtil;
+import com.zps.imchat.utils.RabbitmqUtil;
 import com.zps.imchat.utils.SpringBeanUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +17,12 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +30,9 @@ import java.util.List;
  * @desc : 消息核心处理类
  **/
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+
+
+    RabbitmqUtil rabbitmqUtil = SpringBeanUtil.getBean(RabbitmqUtil.class);
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
@@ -51,7 +61,18 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  String userId = msgData.getDataMap().get("userid");
                  System.out.println(userId);
                  SessionMap.put(userId , channel);
-                 //离线未读聊天信息获取，待为完成
+
+                 //离线未读聊天信息获取
+                 Object message = rabbitmqUtil.getMsgFromQueue(MqServer.QUEUE + userId);
+                 if(message == null) break;
+                 List<MsgJson> msgList = new ArrayList<>();
+
+                 //获取所有离线消息
+                 while (message != null){
+                     msgList.add((MsgJson) message);
+                     message = rabbitmqUtil.getMsgFromQueue(MqServer.QUEUE + userId);
+                 }
+                 channel.writeAndFlush(new TextWebSocketFrame(JsonUtil.pojoTojson(msgList)));
                  break;
 
              case "singleChat" :  /**单聊 */
@@ -62,26 +83,31 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  //保存聊天历史
                  ChatLogs chatLogs = new ChatLogs();
                  chatLogs.setFromid(Long.parseLong(msgData.getDataMap().get("fromid")));
-                 chatLogs.setToid(Long.parseLong(msgData.getDataMap().get("toid")));
+                 chatLogs.setToid(Long.parseLong(toid));
                  chatLogs.setType("singleChat");
                  chatLogs.setContent(msgData.getDataMap().get("context"));
                  chatLogs.setSendtime(msgData.getSendtime());
                  chatLogs.setStatus(1);  //1代表未读
-                 /** 保存到数据库 ，带实现*/
+
+                 /** 保存到数据库 */
                  ChatLogsService chatLogsService = SpringBeanUtil.getBean(ChatLogsService.class);
+                 chatLogsService.saveLogs(chatLogs);
 
-                 if(toChannle == null){    //如果为空，修改信息状态，待完成
-
-
+                 if(toChannle == null){    //如果为空，把该消息缓存到MQ消息队列中
+                     rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
+                                            MqServer.QUEUE + toid , msgData);
                  }else{
+
                      //从userMap中获取最新的channel，防止用户的连接过期失效的情况
                      toChannle = userMap.find(toChannle.id());
-
-                     if(toChannle == null){  //如果为空，修改信息状态，待完成
+                     if(toChannle == null){  //如果为空，把该消息缓存到MQ消息队列中
+                         rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
+                                 MqServer.QUEUE + toid , msgData);
 
                      }
                      //用户在线，直接发送消息
                      toChannle.writeAndFlush(new TextWebSocketFrame(JsonUtil.pojoTojson(msgData)));
+                     System.out.println(JsonUtil.pojoTojson(msgData));
                  }
                  break;
 

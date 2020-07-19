@@ -1,5 +1,6 @@
 package com.zps.imchat.jsonbean;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import java.util.Map;
  * @author: zps
  * @desc : 消息实体类
  **/
-public class MsgJson {
+public class MsgJson implements Serializable {
 
     //消息的类型
     private String type ;
