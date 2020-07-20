@@ -28,5 +28,4 @@ public class BaseExceptionHandle {
             return new ResponseJson(Status.UNKNOWN_ERROR);
         }
     }
-
 }

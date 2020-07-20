@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,8 +73,5 @@ public class UserController {
     public String getMermber(@RequestParam("groupid") String groupid){
 
         return gson.toJson(userService.getMermbers(Long.parseLong(groupid)));
-
     }
-
-
 }

@@ -27,6 +27,7 @@ public class MyFriendController {
     @ApiOperation(value="添加好友接口接口")
     public String addFriend(@RequestParam("myFzid") String myFzid , @RequestParam("userId") String userId ,
                             @RequestParam("nickname") String nickname){
+
         System.out.println(myFzid  + userId + nickname);
         MyFriends myFriends = new MyFriends();
         myFriends.setMyFzId(Long.parseLong(myFzid));

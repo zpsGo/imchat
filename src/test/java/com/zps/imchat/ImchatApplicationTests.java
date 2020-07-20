@@ -57,5 +57,10 @@ class ImchatApplicationTests {
         }
     }
 
+    @Test
+    void testEx(){
+
+    }
+
 
 }
