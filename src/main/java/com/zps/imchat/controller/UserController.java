@@ -2,6 +2,9 @@ package com.zps.imchat.controller;
 
 import com.google.gson.Gson;
 import com.zps.imchat.bean.User;
+import com.zps.imchat.common.Status;
+import com.zps.imchat.exception.BaseException;
+import com.zps.imchat.jsonbean.ResponseJson;
 import com.zps.imchat.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,6 +29,19 @@ public class UserController {
 
     @Autowired
     private Gson gson;
+
+    /**
+     * 测试异常捕获
+     */
+    @GetMapping("/error")
+    @ApiOperation(value="测试全局统一异常处理")
+    public ResponseJson<String> testerror(@RequestParam("id") Integer id){
+        if(id == 0)
+            return ResponseJson.error(new Status(-1 , "除数不能为0"));
+        if(id == 1)
+            throw new BaseException(new Status(0 , "测试抛出异常"));
+        return ResponseJson.success("success");
+    }
 
     //登录
     @PostMapping("/login")
@@ -62,16 +78,21 @@ public class UserController {
     @GetMapping("/mine")
     @ApiOperation(value="获取好友信息接口")
     @ApiImplicitParam(name = "userid", value = "用户id", required = true, dataType = "String", paramType = "query")
-    public String getMineInfo(@RequestParam("userid") String userid){    //获取登录初始化的信息
-        return gson.toJson(userService.getMineInfo(Long.parseLong(userid)));
+    public ResponseJson<String> getMineInfo(@RequestParam("userid") String userid){    //获取登录初始化的信息
+
+        return ResponseJson.success(gson.toJson(userService.getMineInfo(Long.parseLong(userid))));
+
     }
 
     //获取群成员信息
     @GetMapping("/mermber")
     @ApiOperation(value="获取群成员信息接口")
     @ApiImplicitParam(name = "groupid", value = "群聊号", required = true, dataType = "String", paramType = "query")
-    public String getMermber(@RequestParam("groupid") String groupid){
+    public ResponseJson<String> getMermber(@RequestParam("groupid") String groupid){
 
-        return gson.toJson(userService.getMermbers(Long.parseLong(groupid)));
+        return ResponseJson.success(gson.toJson(userService.getMermbers(Long.parseLong(groupid))));
+
     }
+
+
 }

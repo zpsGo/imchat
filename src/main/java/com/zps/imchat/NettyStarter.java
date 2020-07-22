@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NettyStarter implements ApplicationListener<ContextRefreshedEvent> {
-
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         try {
