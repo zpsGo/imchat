@@ -17,7 +17,11 @@ public class Status {
     //定义一些常用的错误信息
     public static Status SUCCESS = new Status(200 , "success");
     public static Status SERVER_ERROR = new Status(500,"服务端异常！");
-    public static Status BIND_ERROR = new Status(50100 ,"参数绑定有问题");
+    public static Status BIND_ERROR = new Status(501 ,"参数绑定有问题");
+    /**
+     * 拒绝访问
+     */
+    public static Status ACCESS_DENIED = new Status(403 ,"拒绝访问");
 
 
     int code;
