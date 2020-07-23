@@ -2,6 +2,7 @@ package com.zps.imchat.utils;
 
 
 import com.zps.imchat.config.EmailAccountConfig;
+import org.springframework.stereotype.Component;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -9,6 +10,8 @@ import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @ClassName EmailUtil
@@ -17,11 +20,14 @@ import java.util.Properties;
  * @Version 1.0
  * @Description 邮件服务工具类(只限于SMTP协议)
  **/
+@Component
 public class EmailUtil {
     private static final String Sender = EmailAccountConfig.sender;
     private static final String SendPwd = EmailAccountConfig.password;
     private static final String MAIL_SMTP_HOST =EmailAccountConfig.host ;
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+
+    private final Lock lock = new ReentrantLock(false);
 
 
     /**
@@ -30,7 +36,7 @@ public class EmailUtil {
      * @param title 邮件标题
      * @Description: 发送邮件
      */
-    public static void sendEmail(String receiver, String content, String title) {
+    public int sendEmail(String receiver, String content, String title) {
         if (receiver != null) {
             //设置配置
             Properties props = new Properties();
@@ -49,29 +55,34 @@ public class EmailUtil {
                 }
             });//设置环境信息
             session.setDebug(true);
+            //可重入锁保证线程安全
+            lock.lock();
             try {
-                MimeMessage message = createMimeMessage(session, Sender, receiver, content, title);
+                MimeMessage message = createMimeMessage(session, receiver, content, title);
                 Transport.send(message);
             } catch (UnsupportedEncodingException | MessagingException e) {
                 e.printStackTrace();
+            }finally {
+                lock.unlock();
             }
+            return 1;
         }
+        return 0;
     }
 
     /**
      * @param session session
-     * @param sendMail 发送方
      * @param receiveMail 接收方
      * @param content 内容
      * @param title 标题
      * @Description: 创建邮件
      */
-    public static MimeMessage createMimeMessage(Session session, String sendMail, String receiveMail, String content, String title) throws UnsupportedEncodingException, MessagingException {
+    private  MimeMessage createMimeMessage(Session session, String receiveMail, String content, String title) throws UnsupportedEncodingException, MessagingException {
         // 1. 创建一封邮件
         MimeMessage message = new MimeMessage(session);
 
         // 2. From: 发件人
-        message.setFrom(new InternetAddress(sendMail, "ImChat工作组", "UTF-8"));
+        message.setFrom(new InternetAddress(EmailUtil.Sender, "ImChat工作组", "UTF-8"));
 
         // 3. To: 收件人（可以增加多个收件人、抄送、密送）
         message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMail, "亲爱的"+receiveMail, "UTF-8"));

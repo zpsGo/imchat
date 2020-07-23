@@ -15,6 +15,7 @@ public class ValidationCodeUtil {
      */
     private static final int DEFAULT_CODE_LENGTH = 6;
     public static final String KEY_CODE_INDEX = "IMCHAT:VERIFY:EMAIL:";
+    public static final int DEFAULT_CODE_EXPIRE_MIN = 30;
 
     /**
      * @param length 长度
