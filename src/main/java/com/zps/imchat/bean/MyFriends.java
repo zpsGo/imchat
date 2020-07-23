@@ -12,13 +12,13 @@ public class MyFriends {
 
     private String nickname;
 
-    private Long statu;
+    private Integer statu;
 
-    public Long getStatu() {
+    public Integer getStatu() {
         return statu;
     }
 
-    public void setStatu(Long statu) {
+    public void setStatu(Integer statu) {
         this.statu = statu;
     }
 

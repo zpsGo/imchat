@@ -1,10 +1,12 @@
 package com.zps.imchat.netty;
 
 import com.zps.imchat.bean.ChatLogs;
+import com.zps.imchat.bean.MyFriends;
 import com.zps.imchat.jsonbean.MsgJson;
 import com.zps.imchat.rabbitmq.MqServer;
 import com.zps.imchat.service.ChatLogsService;
 import com.zps.imchat.service.GroupUserService;
+import com.zps.imchat.service.MyFzService;
 import com.zps.imchat.utils.JsonUtil;
 import com.zps.imchat.utils.RabbitmqUtil;
 import com.zps.imchat.utils.SpringBeanUtil;
@@ -19,8 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author: zps
@@ -35,6 +36,13 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
 
     /**保存连接进来的用户的chanel */
     public static ChannelGroup userMap = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    MyFzService myFzService = SpringBeanUtil.getBean(MyFzService.class);
+
+    ChatLogsService chatLogsService = SpringBeanUtil.getBean(ChatLogsService.class);
+
+    GroupUserService groupUserService = SpringBeanUtil.getBean(GroupUserService.class);
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
@@ -83,54 +91,183 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  chatLogs.setType("singleChat");
                  chatLogs.setContent(msgData.getDataMap().get("context"));
                  chatLogs.setSendtime(msgData.getSendtime());
-                 chatLogs.setStatus(1);  //1代表未读
+                 chatLogs.setStatus(1);  //1 暂时默认已读
 
                  /** 保存到数据库 */
-                 ChatLogsService chatLogsService = SpringBeanUtil.getBean(ChatLogsService.class);
                  chatLogsService.saveLogs(chatLogs);
 
-                 if(toChannle == null){    //如果为空，把该消息缓存到MQ消息队列中
-                     rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
-                                            MqServer.QUEUE + toid , msgData);
-                 }else{
-
-                     //从userMap中获取最新的channel，防止用户的连接过期失效的情况
-                     toChannle = userMap.find(toChannle.id());
-                     if(toChannle == null){  //如果为空，把该消息缓存到MQ消息队列中
-                         rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
-                                 MqServer.QUEUE + toid , msgData);
-
-                     }
-                     //用户在线，直接发送消息
-                     toChannle.writeAndFlush(new TextWebSocketFrame(JsonUtil.pojoTojson(msgData)));
-                     System.out.println(JsonUtil.pojoTojson(msgData));
-                 }
+                 //发送消息
+                 sendMessage(toid , msgData);
                  break;
 
              case "groupChat" :   //群聊
 
                  /**
-                  * 相应的离线消息保存，未完成
+                  * 相应的离线消息保存
                   */
-
                  String groupid = msgData.getDataMap().get("groupid");
-                 GroupUserService groupUserService = SpringBeanUtil.getBean(GroupUserService.class);
+                 ChatLogs groupChatLogs = new ChatLogs();
+                 groupChatLogs.setToid(Long.parseLong(groupid));
+                 groupChatLogs.setFromid(Long.parseLong(msgData.getDataMap().get("fromid")));
+                 groupChatLogs.setContent(msgData.getDataMap().get("context"));
+                 groupChatLogs.setSendtime(msgData.getSendtime());
+                 groupChatLogs.setStatus(1);
+                 groupChatLogs.setType("groupChat");
+                 /** 保存到数据库 */
+                 chatLogsService.saveLogs(groupChatLogs);
+
+                 /** 获取群中群员列表*/
                  List<Long> groupUsersId = groupUserService.findGroupUsersId(Long.parseLong(groupid));
-                 Channel toChannel;
-                 for(Long id : groupUsersId){
-                      toChannel = SessionMap.get(id.toString());
-                      if(toChannel == null){  //离线为读,待完成
 
-                      }
-                      toChannel = userMap.find(toChannel.id());
-                      if(toChannel == null){  //用户可能过期，离线未读,待完成
+                 /** 循环遍历群员，进行消息的推送*/
+                 for(Long id : groupUsersId) {
+                     sendMessage(id.toString(), msgData);
+                 }
+                 break;
 
-                      }
-                      //发送消息
-                      toChannel.writeAndFlush(new TextWebSocketFrame(JsonUtil.pojoTojson(msgData)));
+             case "addFriend" :   //好友申请
+
+                 //获取申请好友id
+                 String friendid = msgData.getDataMap().get("friendid");
+
+                 /**保申请记录保存到数据库，好友状态设置为0 */
+                 MyFriends myFriend = new MyFriends();
+                 myFriend.setMyFzId(Long.parseLong(msgData.getDataMap().get("fzid")));
+                 myFriend.setNickname(msgData.getDataMap().get("nickname"));
+                 myFriend.setUserId(Long.parseLong(friendid));
+                 myFriend.setStatu(0);
+//                 保存到数据库，为实现
+                 myFzService.addFriend(myFriend);
+
+                 /** 修改消息类型为申请确认消息，然后推送给好友，*/
+                 msgData.setType("checkAddFriend");
+                 /**向好友推送消息 */
+                 sendMessage(friendid , msgData);
+                 break;
+
+             case "agreeAddFriend" :  //同意加好友
+
+                 MyFriends myFriend2 = new MyFriends();
+                 myFriend2.setMyFzId(Long.parseLong(msgData.getDataMap().get("myfzid")));
+                 myFriend2.setUserId(Long.parseLong(msgData.getDataMap().get("userid")));
+                 myFriend2.setNickname(msgData.getDataMap().get("nickname"));
+                 myFriend2.setStatu(1);
+                 /** 保存到数据库*/
+                 myFzService.addFriend(myFriend2);
+                 /** 更改申请人好友状态*/
+//                 myFzService.updateStaus(Long.parseLong(msgData.getDataMap().get("fzid")) ,
+//                                         Long.parseLong(msgData.getDataMap().get("friendid")));
+                 break;
+
+             case "refuseAddFriend" :  //拒绝加好友，直接从数据库中删除好友记录
+                 myFzService.deleteFriend(Long.parseLong(msgData.getDataMap().get("fzid")) ,
+                                         Long.parseLong(msgData.getDataMap().get("userid")));
+                 break;
+
+             case "removeFriend" :  //删除好友
+                 myFzService.deleteFriend(Long.parseLong(msgData.getDataMap().get("fzid")) ,
+                         Long.parseLong(msgData.getDataMap().get("friendid")));
+
+                 //向被删除的好友推送消息
+                 MsgJson msgJson = new MsgJson();
+                 msgJson.setType("friendOver");
+                 Map<String , String> data = new HashMap<>();
+                 data.put("fromid" , msgData.getDataMap().get("userid"));
+                 String toid1 = msgData.getDataMap().get("friendid");
+                 data.put("toid" , toid1);
+                 data.put("context" , "你已不是对方好友");
+                 msgJson.setDataMap(data);
+                 msgJson.setExtand("IM聊天");
+                 msgJson.setSendtime(new Date());
+
+                 /** 推送消息*/
+                 sendMessage(toid1 , msgJson);
+                 break;
+
+             case "addFriendToGroup" :  //群主主动拉人进群
+
+                 //保存申请记录到数据库，staus默认为0
+//               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                 //向好友发起申请同意
+                 msgData.setType("checkAddGroupByUser");
+                 //推送消息给好友
+                 sendMessage(msgData.getDataMap().get("friendid") , msgData);
+                 break;
+
+             case "agreeAddGroupByUser" :  //好友或者群主同意加群
+
+                 //更新群员状态
+//                 groupUserService.updateGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                 break;
+
+             case "refuseAddGroupByUser" :  //好友拒绝加群
+
+                 //删除记录
+//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                  break;
+
+             case "addGroup" :      //好友主动加群
+                 //保存申请记录到数据库，staus默认为0
+//               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                 //向群主发起申请同意
+                 msgData.setType("checkBygroupUser");
+                 //推送消息给好友
+                 sendMessage(msgData.getDataMap().get("groupUserId") , msgData);
+                 break;
+
+             case "removeGroupByGroupUser" :   //群主主动踢人
+                 //删除记录
+//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("userid")));
+                 List<Long> groupid1 = groupUserService.findGroupUsersId(Long.parseLong(msgData.getDataMap().get("groupid")));
+                 msgData.setType("adviceToGroupUser");
+
+                 //向群员广播消息
+                 for(Long id : groupid1){
+                     sendMessage(id.toString() , msgData);
+                 }
+                 break;
+
+             case "removeGroupByUser" :
+                 //删除记录
+//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+//                                               Long.parseLong(msgData.getDataMap().get("userid")));
+                 List<Long> groupid2 = groupUserService.findGroupUsersId(Long.parseLong(msgData.getDataMap().get("groupid")));
+                 msgData.setType("adviceToGroup");
+
+                 //向群员广播消息
+                 for(Long id : groupid2){
+                     sendMessage(id.toString() , msgData);
                  }
                  break;
          }
+    }
+
+    /**
+     * 发送消息方法封装
+     * @param toid
+     */
+    private void sendMessage(String toid , MsgJson msgData) {
+        Channel toChannle = SessionMap.get(toid);
+        if(toChannle == null){    //如果为空，把该消息缓存到MQ消息队列中
+            rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
+                    MqServer.QUEUE + toid , msgData);
+        }else{
+
+            //从userMap中获取最新的channel，防止用户的连接过期失效的情况
+            toChannle = userMap.find(toChannle.id());
+            if(toChannle == null){  //如果为空，把该消息缓存到MQ消息队列中
+                rabbitmqUtil.sendMessageToExchange(MqServer.IM_exchange ,
+                        MqServer.QUEUE + toid , msgData);
+
+            }
+            //用户在线，直接发送消息
+            toChannle.writeAndFlush(new TextWebSocketFrame(JsonUtil.pojoTojson(msgData)));
+        }
     }
 
     @Override
