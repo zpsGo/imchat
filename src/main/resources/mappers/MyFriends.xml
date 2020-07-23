@@ -35,4 +35,8 @@
         delete from im_my_friend where my_fz_id=#{myFzid} and user_id=#{userId}
     </delete>
 
+    <update id="updateStaus" parameterType="Long">
+        UPDATE im_my_friend SET statu=1 WHERE my_fz_id =#{fzid} AND user_id =#{userid}
+    </update>
+
 </mapper>

@@ -15,4 +15,5 @@ public interface MyFzService {
     //移除好友
     void deleteFriend(@Param("myFzid") Long myFzid , @Param("userId") Long userId);
 
+    void updateStaus(long fzid, long friendid);
 }

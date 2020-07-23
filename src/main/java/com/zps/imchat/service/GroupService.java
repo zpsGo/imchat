@@ -2,6 +2,8 @@ package com.zps.imchat.service;
 
 
 import com.zps.imchat.bean.Group;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -10,4 +12,6 @@ import java.util.List;
  */
 public interface GroupService {
     List<Group> findGroups(Long userId);
+
+    Group finGroupByGroupId(Long groupid);
 }

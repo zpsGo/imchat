@@ -12,8 +12,15 @@ import java.util.List;
  */
 @Mapper
 public interface ChatLogsDao {
+
     public List<com.zps.imchat.bean.ChatLogs> chatLogs(@Param("userId") Long userId, @Param("status") int status);
 
     void saveLogs(@Param("chatLogs") ChatLogs chatLogs);
+
+    List<com.zps.imchat.bean.ChatLogs> queryLogsOfSingle(@Param("fromid") Long fromid , @Param("toid") Long toid,
+                                                         @Param("logIndex") Long logIndex);
+
+    List<com.zps.imchat.bean.ChatLogs> queryLogsOfGroup(@Param("fromid") Long fromid , @Param("toid") Long toid,
+                                                        @Param("logIndex") Long logIndex);
 
 }

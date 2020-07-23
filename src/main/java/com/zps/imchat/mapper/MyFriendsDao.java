@@ -21,5 +21,6 @@ public interface MyFriendsDao {
     //移除好友
     void deleteFriend(@Param("myFzid") Long myFzid , @Param("userId") Long userId);
 
+    void updateStaus(@Param("fzid") Long fzid , @Param("userid") Long userid);
 
 }

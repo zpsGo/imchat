@@ -27,4 +27,19 @@ public class GroupUsersImp implements GroupUserService {
     public List<Long> findGroupUsersId(Long groupId) {
         return groupUsersDao.findGroupUsersId(groupId);
     }
+
+    @Override
+    public void addGroupUser(long groupid, long friendid) {
+        groupUsersDao.addGroupUser(groupid , friendid);
+    }
+
+    @Override
+    public void updateGroupUser(long groupid, long friendid) {
+        groupUsersDao.updateGroupUser(groupid , friendid);
+    }
+
+    @Override
+    public void deleteGroupUser(long groupid, long friendid) {
+        groupUsersDao.deleteGroupUser(groupid , friendid);
+    }
 }

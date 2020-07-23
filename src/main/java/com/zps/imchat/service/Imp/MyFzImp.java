@@ -25,4 +25,9 @@ public class MyFzImp implements MyFzService {
     public void deleteFriend(Long myFzid, Long userId) {
         myFriendsDao.deleteFriend(myFzid , userId);
     }
+
+    @Override
+    public void updateStaus(long fzid, long friendid) {
+        myFriendsDao.updateStaus(fzid , friendid);
+    }
 }

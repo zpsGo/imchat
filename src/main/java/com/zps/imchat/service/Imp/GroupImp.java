@@ -22,4 +22,9 @@ public class GroupImp implements GroupService {
     public List<Group> findGroups(Long userId) {
         return groupDao.findGroups(userId);
     }
+
+    @Override
+    public Group finGroupByGroupId(Long groupid) {
+        return groupDao.finGroupByGroupId(groupid);
+    }
 }

@@ -20,4 +20,18 @@
     <select id="findUserIdByGroupId" resultType="Long" parameterType="Long">
         select user_id from im_group where group_id=#{groupId}
     </select>
+
+    <insert id="addGroupUser" parameterType="Long">
+        insert into im_group_user (user_id , group_id) values (#{userid} , #{groupid})
+    </insert>
+
+    <update id="updateGroupUser" parameterType="Long">
+        update im_group_user set status=1 where user_id=#{userid} and group_id=#{groupid}
+    </update>
+
+    <delete id="deleteGroupUser" parameterType="Long">
+        delete from im_group_user where user_id=#{userid} and group_id=#{groupid}
+    </delete>
+
+
 </mapper>

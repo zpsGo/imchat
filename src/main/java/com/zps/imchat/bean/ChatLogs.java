@@ -22,7 +22,7 @@ public class ChatLogs {
     private Date sendtime;
 
     @SerializedName("type")
-    private String type;
+    private String typ;
 
     private Integer status;
 
@@ -67,11 +67,11 @@ public class ChatLogs {
     }
 
     public String getType() {
-        return type;
+        return typ;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.typ = type;
     }
 
     public Integer getStatus() {

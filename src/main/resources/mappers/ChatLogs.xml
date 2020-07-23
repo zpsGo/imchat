@@ -13,4 +13,14 @@
                #{chatLogs.sendtime},#{chatLogs.type},#{chatLogs.status})
    </insert>
 
+    <select id="queryLogsOfSingle" parameterType="Long" resultType="com.zps.imchat.bean.ChatLogs">
+        select * from im_chatlog where fromId=#{fromid} and toId=#{toid} and typ='singleChat'
+        order by sendTime DESC limit #{logIndex} , 15
+    </select>
+
+    <select id="queryLogsOfGroup" parameterType="Long" resultType="com.zps.imchat.bean.ChatLogs">
+        select * from im_chatlog where fromId=#{fromid} and toId=#{toid} and typ='groupChat'
+        order by sendTime DESC limit #{logIndex} , 15
+    </select>
+
 </mapper>

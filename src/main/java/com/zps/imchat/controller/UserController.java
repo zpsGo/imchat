@@ -1,9 +1,10 @@
 package com.zps.imchat.controller;
 
-import com.google.gson.Gson;
 import com.zps.imchat.bean.User;
 import com.zps.imchat.common.Status;
 import com.zps.imchat.exception.BaseException;
+import com.zps.imchat.jsonbean.LayimJson;
+import com.zps.imchat.jsonbean.MermbersJson;
 import com.zps.imchat.jsonbean.ResponseJson;
 import com.zps.imchat.service.UserService;
 import io.swagger.annotations.Api;
@@ -26,9 +27,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private Gson gson;
 
     /**
      * 测试异常捕获
@@ -78,9 +76,9 @@ public class UserController {
     @GetMapping("/mine")
     @ApiOperation(value="获取好友信息接口")
     @ApiImplicitParam(name = "userid", value = "用户id", required = true, dataType = "String", paramType = "query")
-    public ResponseJson<String> getMineInfo(@RequestParam("userid") String userid){    //获取登录初始化的信息
+    public ResponseJson<LayimJson> getMineInfo(@RequestParam("userid") String userid){    //获取登录初始化的信息
 
-        return ResponseJson.success(gson.toJson(userService.getMineInfo(Long.parseLong(userid))));
+        return ResponseJson.success(userService.getMineInfo(Long.parseLong(userid)));
 
     }
 
@@ -88,11 +86,25 @@ public class UserController {
     @GetMapping("/mermber")
     @ApiOperation(value="获取群成员信息接口")
     @ApiImplicitParam(name = "groupid", value = "群聊号", required = true, dataType = "String", paramType = "query")
-    public ResponseJson<String> getMermber(@RequestParam("groupid") String groupid){
+    public ResponseJson<MermbersJson> getMermber(@RequestParam("groupid") String groupid){
 
-        return ResponseJson.success(gson.toJson(userService.getMermbers(Long.parseLong(groupid))));
+        return ResponseJson.success(userService.getMermbers(Long.parseLong(groupid)));
 
     }
 
 
+    //根据用户id查询用户信息
+    @GetMapping("queryUserById")
+    @ApiOperation(value="根据用户id获取用户信息")
+    public ResponseJson<User> queryUserById(@RequestParam("id") String id){
+
+        User user = userService.findUser(Long.parseLong(id));
+        //用户不存在
+        if(user == null){
+            return ResponseJson.error(new Status(100 , "用户不存在"));
+        }
+        //返回用户信息
+        return ResponseJson.success(user);
+
+    }
 }

@@ -28,4 +28,14 @@ public class ChatLogsImp implements ChatLogsService {
     public void saveLogs(ChatLogs chatLogs) {
         chatLogsDao.saveLogs(chatLogs);
     }
+
+    @Override
+    public List<ChatLogs> queryLogsOfSingle(Long fromid, Long toid, Long logIndex) {
+        return chatLogsDao.queryLogsOfSingle(fromid , toid , logIndex);
+    }
+
+    @Override
+    public List<ChatLogs> queryLogsOfGroup(Long fromid, Long toid, Long logIndex) {
+        return chatLogsDao.queryLogsOfGroup(fromid , toid ,logIndex);
+    }
 }

@@ -13,4 +13,10 @@ public interface GroupUserService {
     List<User> findGropUsers(Long groupid);
 
     List<Long> findGroupUsersId(Long groupId);
+
+    void addGroupUser(long groupid, long friendid);
+
+    void updateGroupUser(long groupid, long friendid);
+
+    void deleteGroupUser(long groupid, long friendid);
 }

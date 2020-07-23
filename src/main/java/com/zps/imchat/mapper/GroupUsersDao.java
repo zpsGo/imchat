@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Mapper
 public interface GroupUsersDao {
+
     List<User> findGropUsers(Long groupid);
 
     List<Long> findGroupUsersId(@Param("groupId") Long groupId);
@@ -18,5 +19,11 @@ public interface GroupUsersDao {
     User getUserByGroupId(@Param("groupId") Long groupId);
 
     Long findUserIdByGroupId(@Param("groupId") Long groupId);
+
+    void addGroupUser(@Param("groupid") Long groupid , @Param("userid") Long userid);
+
+    void updateGroupUser(@Param("groupid") Long groupid , @Param("userid") Long userid);
+
+    void deleteGroupUser(@Param("groupid") Long groupid , @Param("userid") Long userid);
 
 }

@@ -11,4 +11,8 @@
         select g.* from im_group g , im_group_user guser
         where guser.user_id=#{userId} and guser.group_id=g.group_id
     </select>
+
+    <select id="finGroupByGroupId" resultType="com.zps.imchat.bean.Group" parameterType="Long">
+        select * from im_group where group_id=#{groupid}
+    </select>
 </mapper>

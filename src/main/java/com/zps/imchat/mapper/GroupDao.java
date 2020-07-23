@@ -2,6 +2,7 @@ package com.zps.imchat.mapper;
 
 import com.zps.imchat.bean.Group;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,8 +12,11 @@ import java.util.List;
  */
 @Mapper
 public interface GroupDao {
+
     List<Group> findGroups(Long userId);
 
     List<Group> findGroupsByUserId(Long userId);
+
+    Group finGroupByGroupId(@Param("groupid") Long groupid);
 
 }

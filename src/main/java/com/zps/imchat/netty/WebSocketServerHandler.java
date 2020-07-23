@@ -53,8 +53,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
          String msg = context.text();
 
          System.out.println(msg);
-
-         //channel.writeAndFlush(new TextWebSocketFrame("干嘛呢"));
          MsgJson msgData = JsonUtil.jsonTopojo(msg ,MsgJson.class);
          String type = msgData.getType();
 
@@ -155,8 +153,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  /** 保存到数据库*/
                  myFzService.addFriend(myFriend2);
                  /** 更改申请人好友状态*/
-//                 myFzService.updateStaus(Long.parseLong(msgData.getDataMap().get("fzid")) ,
-//                                         Long.parseLong(msgData.getDataMap().get("friendid")));
+                 myFzService.updateStaus(Long.parseLong(msgData.getDataMap().get("fzid")) ,
+                                         Long.parseLong(msgData.getDataMap().get("friendid")));
                  break;
 
              case "refuseAddFriend" :  //拒绝加好友，直接从数据库中删除好友记录
@@ -165,6 +163,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  break;
 
              case "removeFriend" :  //删除好友
+
                  myFzService.deleteFriend(Long.parseLong(msgData.getDataMap().get("fzid")) ,
                          Long.parseLong(msgData.getDataMap().get("friendid")));
 
@@ -187,8 +186,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
              case "addFriendToGroup" :  //群主主动拉人进群
 
                  //保存申请记录到数据库，staus默认为0
-//               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("friendid")));
                  //向好友发起申请同意
                  msgData.setType("checkAddGroupByUser");
                  //推送消息给好友
@@ -198,21 +197,21 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
              case "agreeAddGroupByUser" :  //好友或者群主同意加群
 
                  //更新群员状态
-//                 groupUserService.updateGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                 groupUserService.updateGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("friendid")));
                  break;
 
              case "refuseAddGroupByUser" :  //好友拒绝加群
 
                  //删除记录
-//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("friendid")));
                   break;
 
              case "addGroup" :      //好友主动加群
                  //保存申请记录到数据库，staus默认为0
-//               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("friendid")));
+               groupUserService.addGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("friendid")));
                  //向群主发起申请同意
                  msgData.setType("checkBygroupUser");
                  //推送消息给好友
@@ -221,8 +220,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
 
              case "removeGroupByGroupUser" :   //群主主动踢人
                  //删除记录
-//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("userid")));
+                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("userid")));
                  List<Long> groupid1 = groupUserService.findGroupUsersId(Long.parseLong(msgData.getDataMap().get("groupid")));
                  msgData.setType("adviceToGroupUser");
 
@@ -234,8 +233,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
 
              case "removeGroupByUser" :
                  //删除记录
-//                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
-//                                               Long.parseLong(msgData.getDataMap().get("userid")));
+                 groupUserService.deleteGroupUser(Long.parseLong(msgData.getDataMap().get("groupid")) ,
+                                               Long.parseLong(msgData.getDataMap().get("userid")));
                  List<Long> groupid2 = groupUserService.findGroupUsersId(Long.parseLong(msgData.getDataMap().get("groupid")));
                  msgData.setType("adviceToGroup");
 
