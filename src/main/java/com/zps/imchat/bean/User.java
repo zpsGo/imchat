@@ -1,16 +1,29 @@
 package com.zps.imchat.bean;
 
+import lombok.*;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
 /**
  * @author :zps
  * @desc:用户实体类
  */
+@Data
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User {
 
     private Long id;
-
+    @NotEmpty(message = "用户名不能为空")
+    @Size(min = 2, max = 20,message = "用户名长度必须在2到20之间")
     private String username;
 
-    private  transient String pass;
+    @NotEmpty(message = "密码不能为空")
+    @Size(min =6,max = 100,message = "密码过长")
+    private transient String pass;
 
     private String sign;
 
@@ -19,73 +32,10 @@ public class User {
     private String avatar;
 
     private Integer sex;
+    @Email(message = "邮箱格式错误")
+    @NotEmpty(message = "邮箱不能为空")
+    @Size(max = 40)
+    private String email;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
-    }
-
-    public String getPass() {
-        return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass == null ? null : pass.trim();
-    }
-
-    public String getSign() {
-        return sign;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign == null ? null : sign.trim();
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status == null ? null : status.trim();
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar == null ? null : avatar.trim();
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    @Override
-    public String toString() {
-        return "ImUser{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", pass='" + pass + '\'' +
-                ", sign='" + sign + '\'' +
-                ", status='" + status + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", sex=" + sex +
-                '}';
-    }
 }
