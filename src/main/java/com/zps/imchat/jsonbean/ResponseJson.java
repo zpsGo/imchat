@@ -1,7 +1,9 @@
 package com.zps.imchat.jsonbean;
 
 import com.zps.imchat.common.Status;
+import lombok.Data;
 
+@Data
 public class ResponseJson <T>{
 
     //状态码
@@ -40,29 +42,5 @@ public class ResponseJson <T>{
         this.code=s.getCode();
         this.errorMsg=s.getErrorMsg();
         this.data=data;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
     }
 }
