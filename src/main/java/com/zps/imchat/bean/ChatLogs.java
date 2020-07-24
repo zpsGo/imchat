@@ -1,6 +1,7 @@
 package com.zps.imchat.bean;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -8,6 +9,7 @@ import java.util.Date;
  * @author :zps
  * @desc: 聊天历史实体
  */
+@Data
 public class ChatLogs {
     private Long chatlogid;
 
@@ -25,63 +27,6 @@ public class ChatLogs {
     private String typ;
 
     private Integer status;
-
-    public Long getChatlogid() {
-        return chatlogid;
-    }
-
-    public void setChatlogid(Long chatlogid) {
-        this.chatlogid = chatlogid;
-    }
-
-    public Long getFromid() {
-        return fromid;
-    }
-
-    public void setFromid(Long fromid) {
-        this.fromid = fromid;
-    }
-
-    public Long getToid() {
-        return toid;
-    }
-
-    public void setToid(Long toid) {
-        this.toid = toid;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Date getSendtime() {
-        return sendtime;
-    }
-
-    public void setSendtime(Date sendtime) {
-        this.sendtime = sendtime;
-    }
-
-    public String getType() {
-        return typ;
-    }
-
-    public void setType(String type) {
-        this.typ = type;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
 
 }
 
