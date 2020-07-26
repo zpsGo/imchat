@@ -4,6 +4,7 @@ package com.zps.imchat.service;
 import com.zps.imchat.bean.User;
 import com.zps.imchat.jsonbean.LayimJson;
 import com.zps.imchat.jsonbean.MermbersJson;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,5 +25,9 @@ public interface UserService {
     void updateUserStatus(Long userId, String status);
 
     List<Long> getUserId();
+
+    User getUserByEmail(@Param("email") String email);
+
+    boolean saveUser(@Param("user") User user);
 
 }

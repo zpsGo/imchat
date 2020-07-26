@@ -24,5 +24,12 @@ public interface UserDao {
     //获取所用用户的id
     List<Long> getUserId();
 
+    /**
+     * @param email 邮箱地址
+     * @return User
+     * @Description: 通过邮箱获取用户
+     */
+    User getUserByEmail(@Param("email") String email);
 
+    int saveUser(@Param("user") User user);
 }

@@ -22,6 +22,22 @@ public class Status {
      * 拒绝访问
      */
     public static Status ACCESS_DENIED = new Status(403 ,"拒绝访问");
+    /**
+     * 邮箱已被注册
+     */
+    public static Status EMAIL_EXISTED = new Status(600 ,"该邮箱已注册");
+    /**
+     * 非法参数（格式校验）
+     */
+    public static Status ILLEGAL_PARAM = new Status(601 ,"非法参数");
+    /**
+     * 参数过期
+     */
+    public static Status PARAM_EXPIRED = new Status(602 ,"参数过期");
+    /**
+     * 登录失败
+     */
+    public static Status LOGIN_FAILURE = new Status(603 ,"登陆失败");
 
 
     int code;

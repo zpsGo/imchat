@@ -2,21 +2,76 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zps.imchat.mapper.UserDao">
-
     <select id="findUser" parameterType="Long" resultType="com.zps.imchat.bean.User">
-        select * from im_user where id=#{id}
+        select *
+        from im_user
+        where id = #{id}
     </select>
 
     <select id="login" parameterType="com.zps.imchat.bean.User" resultType="com.zps.imchat.bean.User">
-        select * from im_user where id=#{user.id} and pass=#{user.pass}
+        select *
+        from im_user
+        where email = #{user.email}
+          and pass = #{user.pass}
     </select>
 
     <update id="updateUserStatus">
-        update im_user set status=#{status} where id=#{userId}
+        update im_user
+        set status=#{status}
+        where id = #{userId}
     </update>
 
     <select id="getUserId" resultType="Long">
-        select id from im_user
+        select id
+        from im_user
     </select>
 
+    <select id="getUserByEmail" resultType="com.zps.imchat.bean.User">
+        select *
+        from im_user
+        where email = #{email}
+    </select>
+    <insert id="saveUser" parameterType="com.zps.imchat.bean.User">
+        insert into im_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="user.avatar != null and user.avatar != ''">
+                avatar,
+            </if>
+            <if test="user.email != null and user.email != ''">
+                email,
+            </if>
+            <if test="user.pass != null and user.pass != ''">
+                pass,
+            </if>
+            <if test="user.sign != null and user.sign != ''">
+                sign,
+            </if>
+            <if test="user.sex != null">
+                sex,
+            </if>
+            <if test="user.username != null and user.username != ''">
+                username,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+           <if test="user.avatar != null and user.avatar != ''">
+                #{user.avatar},
+            </if>
+            <if test="user.email != null and user.email != ''">
+                #{user.email},
+            </if>
+            <if test="user.pass != null and user.pass != ''">
+                 #{user.pass},
+            </if>
+            <if test="user.sign != null and user.sign != ''">
+                #{user.sign},
+            </if>
+            <if test="user.sex != null">
+                #{user.sex},
+            </if>
+            <if test="user.username != null and user.username != ''">
+                #{user.username},
+            </if>
+        </trim>
+    </insert>
 </mapper>

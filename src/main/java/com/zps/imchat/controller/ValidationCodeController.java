@@ -1,7 +1,9 @@
 package com.zps.imchat.controller;
 
+import com.zps.imchat.bean.User;
 import com.zps.imchat.common.Status;
 import com.zps.imchat.jsonbean.ResponseJson;
+import com.zps.imchat.service.UserService;
 import com.zps.imchat.utils.EmailUtil;
 import com.zps.imchat.utils.ValidationCodeUtil;
 import io.swagger.annotations.Api;
@@ -10,13 +12,16 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Email;
 import java.util.concurrent.*;
 
 /**
@@ -29,6 +34,7 @@ import java.util.concurrent.*;
 @RestController
 @RequestMapping(value = "/verify")
 @Api(tags = "获取验证码接口")
+@Validated
 public class ValidationCodeController {
     @Value("${validation.code.length}")
     private Integer length;
@@ -39,6 +45,9 @@ public class ValidationCodeController {
     @Autowired
     private EmailUtil emailUtil;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 可能发生oom
      */
@@ -48,11 +57,10 @@ public class ValidationCodeController {
     @PostMapping("/code")
     @ApiOperation(value = "获取邮箱验证码")
     @ApiImplicitParam(name = "email", value = "用户待注册的邮箱", required = true, dataType = "String", paramType = "query")
-    public ResponseEntity<ResponseJson<String>> getValidationCode(@RequestParam("email") String email) {
-        //匹配邮箱正则表达式
-        if (!email.matches("^\\w+@(\\w+\\.)+\\w+$")) {
-            //不匹配直接返回错误信息
-            return ResponseEntity.ok(new ResponseJson<>(Status.BIND_ERROR, "邮箱格式错误"));
+    public ResponseEntity<ResponseJson<String>> getValidationCode( @Email(message = "邮箱格式错误") @RequestParam("email") String email) {
+        User user = userService.getUserByEmail(email);
+        if (user!=null) {
+            return ResponseEntity.ok(new ResponseJson<>(Status.EMAIL_EXISTED,"邮箱已经注册过了~"));
         }
         //生成验证码
         String code = ValidationCodeUtil.createValidationCode(length);
@@ -66,6 +74,8 @@ public class ValidationCodeController {
             //http状态码设置为forbidden
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseJson);
         }
+        //配置文件事以json存储，不方便直接操作字符串，修改为字符串系列化
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         //保存到redis，会覆盖原来的值
         redisTemplate.opsForValue().set(key, code, ValidationCodeUtil.DEFAULT_CODE_EXPIRE_MIN, TimeUnit.MINUTES);
 //        线程已经关闭就重新生成
@@ -74,7 +84,7 @@ public class ValidationCodeController {
 //        }
         //发送邮件，使用线程池提高性能
         Future<Integer> future = executorService
-                .submit(() -> emailUtil.sendEmail(email, ValidationCodeUtil.content(code, 30), "验证码"));
+                .submit(() -> emailUtil.sendEmail(email, ValidationCodeUtil.content(code, ValidationCodeUtil.DEFAULT_CODE_EXPIRE_MIN), "验证码"));
         //success
         try {
             //邮件成功发生的情况
