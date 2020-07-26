@@ -3,12 +3,14 @@ package com.zps.imchat.netty;
 import com.zps.imchat.bean.ChatLogs;
 import com.zps.imchat.bean.MyFriends;
 import com.zps.imchat.jsonbean.MsgJson;
+import com.zps.imchat.jsonbean.logscache.LogsCacheList;
 import com.zps.imchat.rabbitmq.MqServer;
 import com.zps.imchat.service.ChatLogsService;
 import com.zps.imchat.service.GroupUserService;
 import com.zps.imchat.service.MyFzService;
 import com.zps.imchat.utils.JsonUtil;
 import com.zps.imchat.utils.RabbitmqUtil;
+import com.zps.imchat.utils.RedisUtil;
 import com.zps.imchat.utils.SpringBeanUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,6 +45,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
 
     GroupUserService groupUserService = SpringBeanUtil.getBean(GroupUserService.class);
 
+    RedisUtil redisUtil = SpringBeanUtil.getBean(RedisUtil.class);
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
@@ -59,7 +63,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
          /**根据发送的类型不同进行不同的核心逻辑处理 */
          switch (type) {
 
-             case "connect" :   /**第一次连接，将userId和channnel进行绑定 */
+             case "connect" :  /**第一次连接，将userId和channnel进行绑定 */
                  String userId = msgData.getDataMap().get("userid");
                  System.out.println(userId);
                  SessionMap.put(userId , channel);
@@ -80,19 +84,29 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
              case "singleChat" :  /**单聊 */
                  /**获取接收者的id */
                  String toid = msgData.getDataMap().get("toid");
+                 String fromid = msgData.getDataMap().get("fromid");
                  Channel toChannle = SessionMap.get(toid);
 
                  //保存聊天历史
                  ChatLogs chatLogs = new ChatLogs();
-                 chatLogs.setFromid(Long.parseLong(msgData.getDataMap().get("fromid")));
+                 chatLogs.setFromid(Long.parseLong(fromid));
                  chatLogs.setToid(Long.parseLong(toid));
-                 chatLogs.setType("singleChat");
+                 chatLogs.setTyp("singleChat");
                  chatLogs.setContent(msgData.getDataMap().get("context"));
                  chatLogs.setSendtime(msgData.getSendtime());
                  chatLogs.setStatus(1);  //1 暂时默认已读
 
                  /** 保存到数据库 */
                  chatLogsService.saveLogs(chatLogs);
+
+                 //修改自己聊天列表信息
+                 modifyRedisLogs(fromid , toid , "singleChat" , msgData);
+                 //修改好友聊天列表信息
+                 modifyRedisLogs(toid , fromid , "singleChat" , msgData);
+
+                 //缓存到redis聊天历史队列中
+                 cacheToRedis(fromid , toid , "singleChat", msgData);
+                 cacheToRedis(toid , fromid , "singleChat" , msgData);
 
                  //发送消息
                  sendMessage(toid , msgData);
@@ -110,17 +124,24 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  groupChatLogs.setContent(msgData.getDataMap().get("context"));
                  groupChatLogs.setSendtime(msgData.getSendtime());
                  groupChatLogs.setStatus(1);
-                 groupChatLogs.setType("groupChat");
+                 groupChatLogs.setTyp("groupChat");
                  /** 保存到数据库 */
                  chatLogsService.saveLogs(groupChatLogs);
+
+
 
                  /** 获取群中群员列表*/
                  List<Long> groupUsersId = groupUserService.findGroupUsersId(Long.parseLong(groupid));
 
                  /** 循环遍历群员，进行消息的推送*/
                  for(Long id : groupUsersId) {
+                     //修改群员中每个人的聊天列表
+                     modifyRedisLogs(id.toString() , groupid ,"groupChat" , msgData);
                      sendMessage(id.toString(), msgData);
                  }
+                 //更新群中缓存的最新消息
+                 cacheToRedis("" , groupid , "groupChat" , msgData);
+
                  break;
 
              case "addFriend" :   //好友申请
@@ -244,6 +265,47 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
                  }
                  break;
          }
+    }
+
+    /**
+     * 更新redis中的聊天历史缓存
+     * @param fromid
+     * @param toid
+     * @param type
+     * @param msgData
+     */
+    private void cacheToRedis(String fromid, String toid, String type, MsgJson msgData) {
+        redisUtil.lSet(fromid + toid + "singleChat", msgData);
+        long size = redisUtil.lGetListSize(fromid + toid + "singleChat");
+        if(size >= 51)
+            redisUtil.lpop(fromid + toid + "singleChat");
+    }
+
+
+    /**
+     * 修改redis中的缓存消息
+     * @param fromid
+     * @param toid
+     * @param type
+     * @param msgData
+     */
+    private void modifyRedisLogs(String fromid, String toid, String type, MsgJson msgData) {
+        //从redis中获对象
+        Object o = redisUtil.hget("user_" + fromid, fromid + toid + "singleChat");
+        if(o == null){   //房间第一次创建
+            LogsCacheList cacheList = new LogsCacheList();
+            cacheList.setChat_room_id(fromid + toid + "singleChat");
+            cacheList.setFriendid(Long.parseLong(toid));
+            cacheList.setGmt_create(msgData.getSendtime());
+            cacheList.setGtm_modify(msgData.getSendtime());
+            cacheList.setLastest_new(msgData.getDataMap().get("context"));
+            redisUtil.hset("user_" + fromid, fromid + toid + "singleChat" , cacheList);
+        }else{  //不是第一次创建，直接修改房间时间和信息
+            LogsCacheList cacheList = (LogsCacheList) o;
+            cacheList.setGtm_modify(msgData.getSendtime());
+            cacheList.setLastest_new(msgData.getDataMap().get("context"));
+            redisUtil.hset("user_" + fromid, fromid + toid + "singleChat" , cacheList);
+        }
     }
 
     /**

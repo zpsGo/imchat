@@ -2,29 +2,29 @@ package com.zps.imchat.bean;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author :zps
  * @desc:消息盒子实体
  */
 @Data
 public class MsgBox {
+
     private Long boxId;
 
-    private Long uid;
+    private String type;   //消息盒类型
 
-    private Long fromid;
+    private Long noticer_id; //被通知人
 
-    private Long fromGroup;
+    private Long userid;  //发起通知的人，如好友申请人，群申请人
 
-    private Integer typ;
+    private Integer fzid;  //好友申请专属
 
-    private String remark;
+    private String avatar; //申请人的图片或者群图片
 
-    private String href;
+    private String extand;  //拓展字段，如申请信息
 
-    private Short read;
+    private Date sendtime;  //申请时间
 
-    private Long time;
-
-    private User user;
 }
