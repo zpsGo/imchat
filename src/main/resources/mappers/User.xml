@@ -9,7 +9,7 @@
     </select>
 
     <select id="login" parameterType="com.zps.imchat.bean.User" resultType="com.zps.imchat.bean.User">
-        select *
+        select id, username, sign, status, avatar, sex, email
         from im_user
         where email = #{user.email}
           and pass = #{user.pass}
@@ -54,14 +54,14 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-           <if test="user.avatar != null and user.avatar != ''">
+            <if test="user.avatar != null and user.avatar != ''">
                 #{user.avatar},
             </if>
             <if test="user.email != null and user.email != ''">
                 #{user.email},
             </if>
             <if test="user.pass != null and user.pass != ''">
-                 #{user.pass},
+                #{user.pass},
             </if>
             <if test="user.sign != null and user.sign != ''">
                 #{user.sign},
@@ -74,4 +74,30 @@
             </if>
         </trim>
     </insert>
+    <select id="getUserInfo" resultType="com.zps.imchat.bean.User">
+        select id, username, sign, status, avatar, sex, email
+        from im_user
+        where id = #{userId}
+    </select>
+    <update id="updateUserInfo" parameterType="com.zps.imchat.bean.User">
+        update im_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="user.username != null and user.username != ''">
+                username = #{user.username},
+            </if>
+            <if test="user.avatar != null and user.avatar != ''">
+                avatar = #{user.avatar},
+            </if>
+            <if test="user.sign != null and user.sign != ''">
+                sign=#{user.sign},
+            </if>
+            <if test="user.sex != null">
+                sex=#{user.sex},
+            </if>
+            <if test="user.status != null and user.status != ''">
+                status=#{user.status},
+            </if>
+        </trim>
+        where id = #{user.id}
+    </update>
 </mapper>

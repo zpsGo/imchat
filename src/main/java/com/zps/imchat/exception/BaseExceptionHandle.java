@@ -9,6 +9,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -55,6 +56,8 @@ public class BaseExceptionHandle {
             String str = StringUtils.join(msgList.toArray(), ";");
             //给状态码填充参数
             return new ResponseJson<>(Status.ILLEGAL_PARAM, str);
+        } else if (e instanceof MaxUploadSizeExceededException) {
+            return new ResponseJson<>(Status.SIZE_EXCEED, "文件过大，上传失败！");
         } else {
             //否则，统一报服务端异常
             return ResponseJson.error(Status.SERVER_ERROR);

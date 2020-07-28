@@ -30,4 +30,8 @@ public interface UserService {
 
     boolean saveUser(@Param("user") User user);
 
+    User getUserInfo(@Param("userId") Long userId);
+
+    void updateUserInfo(@Param("user") User user);
+
 }

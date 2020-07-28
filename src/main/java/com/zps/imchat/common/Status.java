@@ -34,10 +34,18 @@ public class Status {
      * 参数过期
      */
     public static Status PARAM_EXPIRED = new Status(602 ,"参数过期");
+
+    /**
+     * 校验失败
+     */
+    public static Status VALIDATION_FAIL = new Status(604 ,"验证失败");
     /**
      * 登录失败
      */
     public static Status LOGIN_FAILURE = new Status(603 ,"登陆失败");
+
+
+    public static Status SIZE_EXCEED = new Status(605, "文件过大，无法上传");
 
 
     int code;

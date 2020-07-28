@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -99,7 +99,8 @@ public class UserController {
     @PostMapping("/register")
     @ApiOperation(value = "用户注册接口")
     @ApiImplicitParam(name = "code", value = "验证码", required = true, dataType = "String", paramType = "query")
-    public ResponseEntity<ResponseJson<String>> register(@Validated User user, @NotNull(message = "验证码不能为空") String code) {
+    public ResponseEntity<ResponseJson<String>> register(@Validated User user,
+                                                         @NotBlank(message = "验证码不能为空") String code) {
         User userByEmail = userService.getUserByEmail(user.getEmail());
         //邮箱已被注册
         if (userByEmail != null) {
@@ -121,7 +122,10 @@ public class UserController {
                 redisTemplate.delete(ValidationCodeUtil.KEY_CODE_INDEX.concat(user.getEmail()));
                 return ResponseEntity.ok(ResponseJson.success("注册成功！"));
             }
-        } else {
+        } else if (!StringUtils.isEmpty(validate) && !code.equals(validate)) {
+            return ResponseEntity.ok(new ResponseJson<>(Status.VALIDATION_FAIL, "验证码错误！"));
+        }
+        else{
             //不管邮箱有没有拉取过验证码，一律为验证码失效
             return ResponseEntity.ok(new ResponseJson<>(Status.PARAM_EXPIRED, "验证码已过期！"));
         }

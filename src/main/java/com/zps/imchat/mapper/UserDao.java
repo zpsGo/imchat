@@ -32,4 +32,8 @@ public interface UserDao {
     User getUserByEmail(@Param("email") String email);
 
     int saveUser(@Param("user") User user);
+
+    User getUserInfo(@Param("userId") Long userId);
+
+    void updateUserInfo(@Param("user") User user);
 }

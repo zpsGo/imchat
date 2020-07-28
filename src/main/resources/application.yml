@@ -33,6 +33,18 @@ spring:
         # 连接池中的最小空闲连接
         min-idle: 0
 
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 10MB
+      max-file-size: 10MB
+
+#设置tomcat文件上传的限制
+server:
+  tomcat:
+    max-swallow-size: -1
+
+
 
 #邮箱配置
 email:
@@ -48,3 +60,13 @@ validation:
   code:
     #长度
     length: 6
+
+
+#阿里云oss
+aliyun:
+  oss:
+    ossEndPoint: oss-cn-shenzhen.aliyuncs.com
+    accessKeyId: LTAI4GC9zNH7thaZ5SHwYNJJ
+    accessKeySecret: g4XPQjxAUzTzMTIYT8wMZy0Zi68MGs
+    bucketName: iamchat
+    httpPath: https://iamchat.oss-cn-shenzhen.aliyuncs.com/

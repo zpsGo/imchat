@@ -1,7 +1,10 @@
 package com.zps.imchat.config;
 
+import com.zps.imchat.common.interceptor.ImgTypeInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -10,6 +13,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  **/
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Bean
+    public ImgTypeInterceptor ImgTypeInterceptor(){
+        return new ImgTypeInterceptor();
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -24,5 +32,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 //放行哪些头部信息
                 .allowedHeaders("*")
                 .maxAge(3600);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(ImgTypeInterceptor()).addPathPatterns("/u/upload/avatar");
     }
 }

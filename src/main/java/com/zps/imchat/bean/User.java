@@ -1,10 +1,9 @@
 package com.zps.imchat.bean;
 
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 /**
  * @author :zps
@@ -25,12 +24,14 @@ public class User {
     @Size(min =6,max = 100,message = "密码过长")
     private transient String pass;
 
+    @Size(max = 60,message = "个性签名长度不得超过60")
     private String sign;
 
     private String status;
 
+    @Size(max = 100)
     private String avatar;
-
+    @Range(min = 0,max = 1)
     private Integer sex;
     @Email(message = "邮箱格式错误")
     @NotEmpty(message = "邮箱不能为空")

@@ -117,6 +117,16 @@ public class UserServiceImp implements UserService {
         return userDao.saveUser(user) == 1;
     }
 
+    @Override
+    public User getUserInfo(Long userId) {
+        return userDao.getUserInfo(userId);
+    }
+
+    @Override
+    public void updateUserInfo(User user) {
+        userDao.updateUserInfo(user);
+    }
+
 }
 
 
